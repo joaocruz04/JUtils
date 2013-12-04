@@ -13,4 +13,11 @@ public class JCal {
         return (int) Math.floor(Math.abs(milis1-milis2) / (1000 * 60 * 60 * 24));
     }
 
+    public static Calendar getCalendarPlusDays(Calendar base, int ndays) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(base.getTime());
+        cal.add(Calendar.DAY_OF_MONTH, ndays);
+        return cal;
+    }
+
 }
