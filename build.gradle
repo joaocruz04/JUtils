@@ -1,17 +1,4 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:0.8.+'
-    }
-}
 apply plugin: 'android-library'
-apply plugin: 'maven'
-
-repositories {
-    mavenCentral()
-}
 
 android {
     compileSdkVersion 18
@@ -21,9 +8,9 @@ android {
         minSdkVersion 9
         targetSdkVersion 18
     }
-
 }
 
 dependencies {
-
+    compile 'com.google.code.gson:gson:2.2.4'
+    compile fileTree(dir: 'libs', include: '*.jar')
 }
