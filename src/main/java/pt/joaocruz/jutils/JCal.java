@@ -82,4 +82,19 @@ public class JCal {
         return calendar;
     }
 
+    /**
+     * Returns a Calendar instance based on its milliseconds
+     * @param millis long value representing the time in milliseconds
+     * @return Returns the Calendar instance based on the milliseconds input.
+     */
+    public static Calendar calendarFromMillis(long millis) {
+        Calendar calendar = Calendar.getInstance(java.util.Locale.getDefault());
+        calendar.setTimeInMillis(millis);
+        return calendar;
+    }
+
+    public static Calendar now() {
+        return Calendar.getInstance(java.util.Locale.getDefault());
+    }
+
 }
