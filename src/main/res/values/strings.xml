@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">JUtils</string>
     <string name="gps_missing_title">GPS disabled</string>
     <string name="gps_missing_msg">The GPS service is disabled. This will affect significantly the precision of your location.</string>
     <string name="gps_missing_activate">Enable GPS</string>

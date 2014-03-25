@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">JUtils</string>
     <string name="gps_missing_title">Localização por GPS desactivada</string>
     <string name="gps_missing_msg">Não tem activa a localização por GPS. Isto irá afectar significativamente a precisão
         da sua localização.
