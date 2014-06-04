@@ -1,6 +1,7 @@
 package pt.joaocruz.jutils;
 
 import android.os.AsyncTask;
+import android.util.Base64;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
@@ -8,6 +9,7 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import org.apache.http.Header;
+import org.apache.http.client.params.ClientPNames;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -43,37 +45,54 @@ public class JOnline {
      */
 
     public static void get(String url, GetCallback callback) {
-        get(url, null, callback);
+        get(url, null, null, null, callback);
     }
 
+    /**
+     * Makes an HTTP GET to a given URL with basic authentication
+     * @param url The url to connect
+     * @param username the username for basic auth
+     * @param password the password for basic auth
+     * @param callback callback that will handle the response
+     */
+    public static void get(String url, String username, String password, GetCallback callback) {
+        get(url, username, password, null, callback);
+    }
 
     /**
      * Makes an HTTP GET to a given URL.
      * @param url the URL to connect
+     * @param username the username for basic auth
+     * @param password the password for basic auth
      * @param objClass class of the returned object (if json > object). If null, returns a string.
      * @param callback callback that will handle the response
      */
 
-    public static void get(final String url, final Class objClass, final GetCallback callback) {
-        print("Geting: " + url);
-        client.get(url, null, new AsyncHttpResponseHandler() {
+    public static void get(final String url, String username, String password, final Class objClass, final GetCallback callback) {
+        print("Geting: " + url + " for user/password: " + username + " / " + password);
+        if (username!=null) {
+            client.addHeader("Authorization", "Basic " + Base64.encodeToString((username + ":" + password).getBytes(), Base64.NO_WRAP));
+            client.getHttpClient().getParams().setParameter(ClientPNames.ALLOW_CIRCULAR_REDIRECTS, true);
+        }
+        else
+            client.removeHeader("Authorization");
+        client.get(url, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(String content) {
                 super.onSuccess(content);
                 if (objClass == null) {
                     callback.onSuccess(content);
-                }
-                else {
+                } else {
                     try {
                         Gson gson = new Gson();
                         Object obj = gson.fromJson(content, objClass);
                         callback.onSuccess(obj);
+
                     } catch (JsonParseException e) {
                         print("Error in parse geting " + url);
                         e.printStackTrace();
                         callback.onFailure(FetchErrorType.PARSE);
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         print("General error geting " + url);
                         e.printStackTrace();
                         callback.onFailure(FetchErrorType.OTHER);
@@ -89,8 +108,7 @@ public class JOnline {
                 if (error instanceof IOException) {
                     print("Connection error geting " + url);
                     callback.onFailure(FetchErrorType.CONNECTION);
-                }
-                else {
+                } else {
                     print("General error geting " + url);
                     callback.onFailure(FetchErrorType.OTHER);
                 }
