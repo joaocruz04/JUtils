@@ -29,7 +29,7 @@ public class JOnline {
     public static boolean debug = true;
 
     private static final String TAG = JLog.prettyPrinting? "JOnline___" : "JOnline";
-    public static enum FetchErrorType  {CONNECTION, PARSE, BAD_URL, OTHER};
+    public static enum FetchErrorType  {CONNECTION, PARSE, BAD_URL, OTHER, USER_EXISTS};
     private static AsyncHttpClient client = new AsyncHttpClient();
 
 
