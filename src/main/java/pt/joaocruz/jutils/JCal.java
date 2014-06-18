@@ -11,6 +11,23 @@ public class JCal {
     public static enum Type {SECOND, MINUTE, HOUR, DAY, MONTH, YEAR};
     public static enum DifferenceType {SECOND, MINUTE, HOUR, DAY};
 
+    private static int SECONDS = 1000;
+    private static int MINUTES = 60;
+    private static int HOURS = 60;
+    private static int DAYS = 24;
+
+    private static long NDAYS = SECONDS*MINUTES*HOURS*DAYS;
+    private static long NHOURS = SECONDS*MINUTES*HOURS;
+    private static long NMINUTES = SECONDS*MINUTES;
+    private static long NSECONDS = SECONDS;
+
+    public static class DateDifference {
+        public long nDays, nHours, nMinutes, nSeconds;
+        public boolean firstIsBigger;
+        public DateDifference(boolean firstBigger, long days, long hours, long minutes, long seconds) {
+            firstIsBigger=firstBigger; nDays = days; nHours = hours; nMinutes = minutes; nSeconds = seconds;
+        }
+    }
 
     /**
      * Returns the difference between two Calendars.
@@ -19,6 +36,7 @@ public class JCal {
      * @param type Difference type (Seconds, Minutes, Hours, Days)
      * @return returns the (first - second) operation
      */
+
     public static int difference(Calendar first, Calendar second, DifferenceType type) {
         long milis1 = first.getTimeInMillis();
         long milis2 = second.getTimeInMillis();
@@ -31,6 +49,26 @@ public class JCal {
             default: factor = 1;
         }
         return (int)(Math.floor(milis1-milis2) / factor);
+    }
+
+    /**
+     * Returns the difference between two Calendars.
+     * @param first The first Calendar
+     * @param second The second Calendar
+     * @return returns the number of days, hours, minutes and seconds between the two calendars
+     */
+    public static DateDifference getDifference(Calendar first, Calendar second) {
+        long diff = first.getTimeInMillis()-second.getTimeInMillis();
+        boolean b = diff>0;
+        diff = Math.abs(diff);
+        long nDays = diff / NDAYS;
+        long remainder =  diff-nDays*NDAYS;
+        long nHours = remainder/NHOURS;
+        long remainder2 = remainder-nHours*NHOURS;
+        long nMinutes = remainder2 / NMINUTES;
+        long remainder3 = remainder2 - nMinutes*NMINUTES;
+        long nSeconds = remainder3/ NSECONDS;
+        return new DateDifference(b, nDays, nHours, nMinutes, nSeconds);
     }
 
 
