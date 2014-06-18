@@ -52,6 +52,44 @@ public class JAlert {
         alertDialog.show();
     }
 
+    public static void showYesNoDialog(final Context context, String title, String message, String yes, String no, final Runnable yes_action, final Runnable no_action){
+        AlertDialog.Builder alertDialog=new AlertDialog.Builder(context);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setCancelable(false);
+        alertDialog.setNegativeButton(no, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+                no_action.run();
+            }
+        });
+        alertDialog.setPositiveButton(yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                yes_action.run();
+            }
+        });
+        alertDialog.show();
+    }
+
+    public static void showOKDialog(final Context context, String title, String message,String ok_lbl, final Runnable ok_action){
+        AlertDialog.Builder alertDialog=new AlertDialog.Builder(context);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setCancelable(false);
+        alertDialog.setPositiveButton(ok_lbl, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                ok_action.run();
+            }
+        });
+        alertDialog.show();
+    }
+
 
 
 }
