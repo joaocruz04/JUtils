@@ -76,6 +76,19 @@ public class JAlert {
         alertDialog.show();
     }
 
+    public static void showOKDialog(Context context, String title, String message, String ok_bt, final Runnable onOK) {
+        AlertDialog.Builder alertDialog=new AlertDialog.Builder(context);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setPositiveButton(ok_bt, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                if (onOK!=null)
+                    onOK.run();
+            }
+        });
+        alertDialog.show();
 
-
+    }
 }
