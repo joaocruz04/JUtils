@@ -5,12 +5,14 @@ repositories {
 }
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdkVersion 19
+    buildToolsVersion "19.1.0"
+
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion rootProject.ext.compileSdkVersion
+        minSdkVersion 9
+        targetSdkVersion 19
+
     }
 
     compileOptions {

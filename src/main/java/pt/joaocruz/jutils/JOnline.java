@@ -3,21 +3,31 @@ package pt.joaocruz.jutils;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Base64;
+import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.TextHttpResponseHandler;
 import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.params.ClientPNames;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpParams;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
@@ -32,6 +42,9 @@ public class JOnline {
     public static boolean debug = true;
 
     private static final String TAG = JLog.prettyPrinting? "JOnline___" : "JOnline";
+
+
+
     public static enum FetchErrorType  {CONNECTION, PARSE, BAD_URL, OTHER, USER_EXISTS};
     private static AsyncHttpClient client = null;
 
@@ -199,9 +212,9 @@ public class JOnline {
                 }
             }
         });
-
-
     }
+
+
 
     public static void post(Context c, final String url, String bodyContent, final Class objClass, final GetCallback callback) {
         initClient();
@@ -253,9 +266,61 @@ public class JOnline {
                 }
             }
         });
-
-
     }
+
+
+    public static void post(final String url,
+                            final File file,
+                            final TextHttpResponseHandler responseHandler) {
+
+        new AsyncTask<String, Void, Void>() {
+
+            Exception error;
+            String status;
+
+            @Override
+            protected Void doInBackground(String... params) {
+                String absurl = url;
+
+                HttpParams httpParameters = new BasicHttpParams();
+
+                DefaultHttpClient httpClient = new DefaultHttpClient(httpParameters);
+                HttpPost httpPost = new HttpPost(absurl);
+                HttpResponse execute;
+
+                try {
+                    InputStreamEntity reqEntity = new InputStreamEntity(new FileInputStream(file), -1);
+                    reqEntity.setContentType("binary/octet-stream");
+                    reqEntity.setChunked(false);
+                    httpPost.setEntity(reqEntity);
+
+                    Log.i(TAG, "Sending File " + file.getName());
+                    execute = httpClient.execute(httpPost);
+                    status = execute.toString();
+                    Log.i(TAG, "File Sent");
+
+                } catch (Exception e) {
+                    error = e;
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+                super.onPostExecute(result);
+                if (error == null) {
+                    responseHandler.onSuccess(200, new Header[0], "");
+                } else {
+                    responseHandler.onFailure(500, new Header[0], "", new Exception(status + " / " + error.getMessage(), error));
+                }
+            }
+        }.execute();
+    }
+
+
+
+
+
 
     /**
      * Makes a request for a SOAP based web-service
