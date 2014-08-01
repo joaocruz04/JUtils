@@ -85,6 +85,7 @@ public class JOnline {
     public static void get(final String url, String username, String password, final Class objClass, final GetCallback callback) {
         initClient();
         print("Geting: " + url + " for user/password: " + username + " / " + password);
+        client.setTimeout(20000);
         if (username!=null) {
             client.addHeader("Authorization", "Basic " + Base64.encodeToString((username + ":" + password).getBytes(), Base64.NO_WRAP));
             client.getHttpClient().getParams().setParameter(ClientPNames.ALLOW_CIRCULAR_REDIRECTS, true);
@@ -92,6 +93,13 @@ public class JOnline {
         else
             client.removeHeader("Authorization");
         client.get(url, new AsyncHttpResponseHandler() {
+
+            /*
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                JLog.print(" I'm here.....");
+            }*/
+
             @Override
             public void onSuccess(String content) {
                 super.onSuccess(content);
