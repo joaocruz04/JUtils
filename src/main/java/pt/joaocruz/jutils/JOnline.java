@@ -1,5 +1,6 @@
 package pt.joaocruz.jutils;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Base64;
 import com.google.gson.Gson;
@@ -10,6 +11,7 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import org.apache.http.Header;
 import org.apache.http.client.params.ClientPNames;
+import org.apache.http.entity.StringEntity;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -17,6 +19,7 @@ import org.ksoap2.transport.HttpTransportSE;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Created by BEWARE S.A. on 26/02/14.
@@ -30,7 +33,7 @@ public class JOnline {
 
     private static final String TAG = JLog.prettyPrinting? "JOnline___" : "JOnline";
     public static enum FetchErrorType  {CONNECTION, PARSE, BAD_URL, OTHER, USER_EXISTS};
-    private static AsyncHttpClient client = new AsyncHttpClient();
+    private static AsyncHttpClient client = null;
 
 
     private static void print(String message) {
@@ -59,6 +62,15 @@ public class JOnline {
         get(url, username, password, null, callback);
     }
 
+
+    private static void initClient() {
+        if (client==null) {
+            client = new AsyncHttpClient();
+            client.setMaxConnections(3);
+        }
+    }
+
+
     /**
      * Makes an HTTP GET to a given URL.
      * @param url the URL to connect
@@ -68,7 +80,10 @@ public class JOnline {
      * @param callback callback that will handle the response
      */
 
+
+
     public static void get(final String url, String username, String password, final Class objClass, final GetCallback callback) {
+        initClient();
         print("Geting: " + url + " for user/password: " + username + " / " + password);
         if (username!=null) {
             client.addHeader("Authorization", "Basic " + Base64.encodeToString((username + ":" + password).getBytes(), Base64.NO_WRAP));
@@ -116,6 +131,10 @@ public class JOnline {
         });
     }
 
+    public static void cancelRequests(Context c, boolean mayInterrupt) {
+        client.cancelRequests(c, mayInterrupt);
+    }
+
     /**
      * Makes an HTTP POST to a given URL with specified parameters.
      * @param url the URL to connect.
@@ -130,7 +149,64 @@ public class JOnline {
      */
 
     public static void post(final String url, RequestParams params, final Class objClass, final GetCallback callback) {
+        initClient();
+        client.setMaxRetriesAndTimeout(0, 1000);
+        client.setTimeout(10000);
         client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(String content) {
+                super.onSuccess(content);
+                if (objClass == null) {
+                    callback.onSuccess(content);
+                }
+                else {
+                    try {
+                        Gson gson = new Gson();
+                        Object obj = gson.fromJson(content, objClass);
+                        callback.onSuccess(obj);
+                    } catch (JsonParseException e) {
+                        e.printStackTrace();
+                        print("Parse error geting " + url);
+                        callback.onFailure(FetchErrorType.PARSE);
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                        print("General error geting " + url);
+                        callback.onFailure(FetchErrorType.OTHER);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                super.onFailure(statusCode, headers, responseBody, error);
+                error.printStackTrace();
+                if (error instanceof IOException) {
+                    print("Connection error geting " + url);
+                    callback.onFailure(FetchErrorType.CONNECTION);
+                }
+                else {
+                    print("General error geting " + url);
+                    callback.onFailure(FetchErrorType.OTHER);
+                }
+            }
+        });
+
+
+    }
+
+    public static void post(Context c, final String url, String bodyContent, final Class objClass, final GetCallback callback) {
+        initClient();
+        StringEntity entity;
+        try {
+            entity = new StringEntity(bodyContent);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            entity = null;
+        }
+        client.setMaxRetriesAndTimeout(0, 1000);
+        client.setTimeout(10000);
+        client.post(c, url, entity, "application/json", new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(String content) {
                 super.onSuccess(content);
