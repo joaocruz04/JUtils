@@ -79,6 +79,7 @@ public class JAlert {
     public static void showOKDialog(Context context, String title, String message, String ok_bt, final Runnable onOK) {
         AlertDialog.Builder alertDialog=new AlertDialog.Builder(context);
         alertDialog.setTitle(title);
+        alertDialog.setCancelable(false);
         alertDialog.setMessage(message);
         alertDialog.setPositiveButton(ok_bt, new DialogInterface.OnClickListener() {
             @Override

@@ -135,4 +135,16 @@ public class JCal {
         return Calendar.getInstance(java.util.Locale.getDefault());
     }
 
+    public static boolean isToday(Calendar date) {
+        Calendar now = now();
+        int now_day = now.get(Calendar.DAY_OF_MONTH);
+        int now_month = now.get(Calendar.MONTH);
+        int now_year = now.get(Calendar.YEAR);
+        int date_day = date.get(Calendar.DAY_OF_MONTH);
+        int date_month = date.get(Calendar.MONTH);
+        int date_year = date.get(Calendar.YEAR);
+        return (now_day == date_day) && (now_month==date_month) && (now_year==date_year);
+
+    }
+
 }

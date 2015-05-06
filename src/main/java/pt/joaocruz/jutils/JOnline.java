@@ -6,7 +6,6 @@ import android.util.Base64;
 import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonSyntaxException;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -20,11 +19,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
-import org.ksoap2.SoapEnvelope;
-import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapSerializationEnvelope;
-import org.ksoap2.transport.HttpTransportSE;
-import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -322,22 +316,7 @@ public class JOnline {
 
 
 
-    /**
-     * Makes a request for a SOAP based web-service
-     * @param namespace the web-service namespace
-     * @param url the web-service url
-     * @param methodName the web-service method name
-     * @param parameters the web-service parameters.
-     *                   Example with 2 parameters:
-     *                   {@code
-     *                      String[][] parameters = new String[2][2];
-     *                      parameters[0] = new String[] { "key1", value1 };
-     *                      parameters[1] = new String[] { "key2", value2 };
-     *                    }
-     *
-     * @param objClass class of the returned object (if json > object). If null, returns the response string.
-     * @param callback callback that will handle the response.
-     */
+    /*
 
     public static void getWS(String namespace, final String url, final String methodName, final String[][] parameters, final Class objClass, final GetCallback callback) {
 
@@ -396,7 +375,7 @@ public class JOnline {
 
     }
 
-
+*/
 
     public interface GetCallback {
         public void onSuccess(Object object);
